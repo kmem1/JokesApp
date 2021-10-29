@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">JokesApp</string>
+    <string name="retry">Повторить</string>
+    <string name="error_message">Ошибка подключения к серверу</string>
 </resources>

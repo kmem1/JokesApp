@@ -1,12 +1,10 @@
-package com.example.jokesapp
+package com.example.jokesapp.presentation
 
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jokesapp.data.remote.JokesApi
 import com.example.jokesapp.databinding.ActivityMainBinding
 import com.example.jokesapp.domain.model.JokeCategory
@@ -14,11 +12,10 @@ import com.example.jokesapp.domain.repository.JokesRepository
 import com.example.jokesapp.presentation.adapters.JokesCategoryAdapter
 import com.example.jokesapp.presentation.item_decorations.GridSpacingItemDecoration
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), JokesCategoryAdapter.Listener {
 
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
@@ -37,12 +34,12 @@ class MainActivity : AppCompatActivity() {
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.recyclerView.adapter = JokesCategoryAdapter(categories)
+        binding.recyclerView.adapter = JokesCategoryAdapter(categories, this)
         binding.recyclerView.layoutManager = GridLayoutManager(baseContext, SPAN_COUNT)
         binding.recyclerView.addItemDecoration(
             GridSpacingItemDecoration(
                 SPAN_COUNT,
-                convertDpToPx(baseContext, 16F),
+                convertDpToPx(baseContext, RECYCLER_VIEW_MARGIN),
                 true,
                 0
             )
@@ -55,5 +52,11 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val SPAN_COUNT = 2
+        private const val RECYCLER_VIEW_MARGIN = 16F
+    }
+
+    override fun onCategoryClick(position: Int) {
+        val intent = Intent(this, CategoryDetailsActivity::class.java)
+        startActivity(intent)
     }
 }

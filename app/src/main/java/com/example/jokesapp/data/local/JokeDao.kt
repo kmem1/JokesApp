@@ -7,7 +7,10 @@ import com.example.jokesapp.domain.model.Joke
 interface JokeDao {
 
     @Query("SELECT * FROM jokes")
-    fun getJokes(deckId: Int): List<Joke>
+    fun getJokes(): List<Joke>
+
+    @Query("DELETE FROM jokes")
+    fun deleteAllJokes()
 
     @Insert
     fun insertJokes(jokes: List<Joke>)

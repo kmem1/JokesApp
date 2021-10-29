@@ -4,10 +4,15 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/Kmem/AndroidStudioProjects/JokesApp/app/src/main/res/drawable/ic_launcher_background.xml" value="0.3828125" />
+        <entry key="..\:/Users/Kmem/AndroidStudioProjects/JokesApp/app/src/main/res/drawable/joke_bg.xml" value="0.3828125" />
+        <entry key="..\:/Users/Kmem/AndroidStudioProjects/JokesApp/app/src/main/res/drawable/joke_bg_ripple.xml" value="0.3828125" />
         <entry key="..\:/Users/Kmem/AndroidStudioProjects/JokesApp/app/src/main/res/drawable/joke_category_bg.xml" value="0.3828125" />
         <entry key="..\:/Users/Kmem/AndroidStudioProjects/JokesApp/app/src/main/res/drawable/joke_category_bg_ripple.xml" value="0.3828125" />
+        <entry key="..\:/Users/Kmem/AndroidStudioProjects/JokesApp/app/src/main/res/layout/activity_category_details.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Kmem/AndroidStudioProjects/JokesApp/app/src/main/res/layout/activity_main.xml" value="0.35260416666666666" />
+        <entry key="..\:/Users/Kmem/AndroidStudioProjects/JokesApp/app/src/main/res/layout/joke.xml" value="0.20520833333333333" />
         <entry key="..\:/Users/Kmem/AndroidStudioProjects/JokesApp/app/src/main/res/layout/joke_category.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Kmem/AndroidStudioProjects/JokesApp/app/src/main/res/layout/progress_item.xml" value="0.36666666666666664" />
       </map>
     </option>
   </component>
