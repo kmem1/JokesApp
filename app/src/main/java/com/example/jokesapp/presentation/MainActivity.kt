@@ -2,9 +2,10 @@ package com.example.jokesapp.presentation
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.jokesapp.JokesApplication
 import com.example.jokesapp.data.remote.JokesApi
 import com.example.jokesapp.databinding.ActivityMainBinding
 import com.example.jokesapp.domain.model.JokeCategory
@@ -31,6 +32,10 @@ class MainActivity : AppCompatActivity(), JokesCategoryAdapter.Listener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if (JokesApplication.getLastCategoryIdFromPreferences() != 0) {
+            openDetailsActivity()
+        }
+
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -46,6 +51,12 @@ class MainActivity : AppCompatActivity(), JokesCategoryAdapter.Listener {
         )
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        JokesApplication.setLastCategoryIdInPreferences(0)
+    }
+
     private fun convertDpToPx(context: Context, dp: Float): Int {
         return (dp * context.resources.displayMetrics.density).toInt()
     }
@@ -57,6 +68,19 @@ class MainActivity : AppCompatActivity(), JokesCategoryAdapter.Listener {
 
     override fun onCategoryClick(position: Int) {
         val intent = Intent(this, CategoryDetailsActivity::class.java)
+        intent.putExtra(CategoryDetailsActivity.EXTRA_CATEGORY_NAME, categories[position].name)
+        intent.putExtra(CategoryDetailsActivity.EXTRA_CATEGORY_ID, categories[position].id)
+        startActivity(intent)
+    }
+
+    private fun openDetailsActivity() {
+        val id = JokesApplication.getLastCategoryIdFromPreferences()
+        val name = JokesApplication.getCategoryNameFromPreferences()
+
+        val intent = Intent(this, CategoryDetailsActivity::class.java)
+        intent.putExtra(CategoryDetailsActivity.EXTRA_CATEGORY_NAME, name)
+        intent.putExtra(CategoryDetailsActivity.EXTRA_CATEGORY_ID, id)
+        intent.putExtra(CategoryDetailsActivity.EXTRA_IS_RESTORED, true)
         startActivity(intent)
     }
 }

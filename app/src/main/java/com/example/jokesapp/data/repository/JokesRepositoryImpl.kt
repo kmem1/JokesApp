@@ -2,14 +2,14 @@ package com.example.jokesapp.data.repository
 
 import android.content.Context
 import android.util.Log
+import com.example.jokesapp.JokesApplication
 import com.example.jokesapp.common.State
+import com.example.jokesapp.data.local.AppDatabase
 import com.example.jokesapp.data.remote.JokesApi
 import com.example.jokesapp.domain.model.Joke
 import com.example.jokesapp.domain.repository.JokesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
@@ -19,7 +19,7 @@ class JokesRepositoryImpl(
     private val api: JokesApi
 ) : JokesRepository {
 
-    override suspend fun getJokes(categoryId: Int): State<List<Joke>> {
+    override suspend fun getJokes(categoryId: Int, searchInCache: Boolean): State<List<Joke>> {
         val jokes = ArrayList<Joke>()
         var errorCounter = 0
 
@@ -49,9 +49,42 @@ class JokesRepositoryImpl(
                     continue@outer
                 }
             }
+
+            saveToCache(jokes)
             return State.success(jokes.toList())
         }
-        return State.failed("Error while getting jokes")
+
+        return if (searchInCache) {
+            getJokesFromCache(categoryId)
+        } else {
+            State.failed("Error while getting jokes")
+        }
+    }
+
+    override suspend fun getJokesFromCache(categoryId: Int): State<List<Joke>> {
+        if (categoryId != JokesApplication.getCachedCategoryIdFromPreferences()) {
+            return State.failed("Error while getting jokes")
+        }
+
+        val result = ArrayList<Joke>()
+
+        withContext(Dispatchers.IO) {
+            result.addAll(AppDatabase.getInstance(context).jokeDao().getJokes())
+        }
+
+        return if (result.isNotEmpty()) {
+            State.success(result)
+        } else {
+            State.failed("Error while getting jokes")
+        }
+    }
+
+
+    private suspend fun saveToCache(items: ArrayList<Joke>) {
+        withContext(Dispatchers.IO) {
+            AppDatabase.getInstance(context).jokeDao().deleteAllJokes()
+            AppDatabase.getInstance(context).jokeDao().insertJokes(items)
+        }
     }
 
     companion object {

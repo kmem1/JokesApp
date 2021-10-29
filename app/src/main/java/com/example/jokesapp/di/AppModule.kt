@@ -3,7 +3,6 @@ package com.example.jokesapp.di
 import android.content.Context
 import com.example.jokesapp.data.remote.JokesApi
 import com.example.jokesapp.data.repository.JokesRepositoryImpl
-import com.example.jokesapp.domain.model.Joke
 import com.example.jokesapp.domain.repository.JokesRepository
 import dagger.Module
 import dagger.Provides

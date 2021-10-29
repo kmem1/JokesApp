@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.jokesapp.R
 import com.example.jokesapp.common.LoadState
-import com.example.jokesapp.common.State
 import com.example.jokesapp.databinding.ProgressItemBinding
 
 class JokesLoadStateAdapter(private val retry: () -> Unit, private val errorMessage: String) :

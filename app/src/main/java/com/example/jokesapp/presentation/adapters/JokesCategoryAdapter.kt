@@ -1,15 +1,14 @@
 package com.example.jokesapp.presentation.adapters
 
-import android.nfc.Tag
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.jokesapp.R
 import com.example.jokesapp.databinding.JokeCategoryBinding
+import com.example.jokesapp.domain.model.JokeCategory
 
 class JokesCategoryAdapter(
-    private val jokesCategories: ArrayList<String>,
+    private val jokesCategories: ArrayList<JokeCategory>,
     private val listener: Listener? = null
 ) :
     RecyclerView.Adapter<JokesCategoryAdapter.ViewHolder>() {
@@ -34,8 +33,8 @@ class JokesCategoryAdapter(
     inner class ViewHolder(private val binding: JokeCategoryBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(category: String, listener: Listener?, position: Int) {
-            binding.categoryName.text = category
+        fun bind(category: JokeCategory, listener: Listener?, position: Int) {
+            binding.categoryName.text = category.name
 
             binding.root.setOnClickListener {
                 listener?.onCategoryClick(position)

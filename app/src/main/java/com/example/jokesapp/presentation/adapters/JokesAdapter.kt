@@ -2,6 +2,7 @@ package com.example.jokesapp.presentation.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.jokesapp.R
 import com.example.jokesapp.databinding.JokeBinding
