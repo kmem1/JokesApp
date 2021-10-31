@@ -1,6 +1,7 @@
 package com.example.jokesapp.presentation
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -9,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jokesapp.JokesApplication
 import com.example.jokesapp.R
 import com.example.jokesapp.common.LoadState
-import com.example.jokesapp.common.State
 import com.example.jokesapp.databinding.ActivityCategoryDetailsBinding
 import com.example.jokesapp.domain.model.Joke
 import com.example.jokesapp.presentation.adapters.JokesAdapter
@@ -17,8 +17,8 @@ import com.example.jokesapp.presentation.adapters.JokesLoadStateAdapter
 import com.example.jokesapp.presentation.scroll_listeners.PaginationScrollListener
 import com.example.jokesapp.presentation.viewmodels.CategoryDetailsViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class CategoryDetailsActivity : AppCompatActivity() {
@@ -58,17 +58,7 @@ class CategoryDetailsActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = categoryName
 
-        if (savedInstanceState != null) {
-            jokes.addAll(
-                savedInstanceState.getParcelableArrayList<Joke>(SAVED_JOKES) as? ArrayList<Joke>
-                    ?: arrayListOf()
-            )
-            jokesAdapter.notifyDataSetChanged()
-        }
-
-        if (jokes.isEmpty()) {
-            loadJokes()
-        }
+        collectJokes()
 
         addScrollListenerToRecyclerView()
     }
@@ -92,7 +82,7 @@ class CategoryDetailsActivity : AppCompatActivity() {
     }
 
     private fun loadJokes() {
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch {
             val jokesFlow =
                 if (!isRestored) {
                     viewModel.getJokes(categoryId)
@@ -102,24 +92,36 @@ class CategoryDetailsActivity : AppCompatActivity() {
 
             isRestored = false
 
-            jokesFlow.collect { result ->
+            jokesFlow.collectLatest { result ->
+                Log.d("qwe", "collecting $isLoading")
                 when (result) {
-                    is State.Loading -> {
+                    is LoadState.Loading -> {
                         loadStateAdapter?.loadState = LoadState.Loading
                         isLoading = true
                     }
-                    is State.Success -> {
-                        jokes.addAll(result.data)
-                        jokesAdapter.notifyDataSetChanged()
+                    is LoadState.Success -> {
                         loadStateAdapter?.loadState = LoadState.Success
+                        Log.d("qwe", "success")
                         isLoading = false
                         saveState()
-                        this@launchWhenCreated.cancel()
                     }
-                    is State.Failed -> {
+                    is LoadState.Failed -> {
                         loadStateAdapter?.loadState = LoadState.Failed
-                        this@launchWhenCreated.cancel()
                     }
+                }
+            }
+        }
+    }
+
+    private fun collectJokes() {
+        lifecycleScope.launchWhenCreated {
+            viewModel.jokes.collectLatest { newJokes ->
+                if (newJokes.isEmpty()) {
+                    loadJokes()
+                } else {
+                    jokes.clear()
+                    jokes.addAll(newJokes)
+                    jokesAdapter.notifyDataSetChanged()
                 }
             }
         }
@@ -142,16 +144,9 @@ class CategoryDetailsActivity : AppCompatActivity() {
         finish()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        outState.putParcelableArrayList(SAVED_JOKES, jokes)
-    }
-
     companion object {
         const val EXTRA_CATEGORY_ID = "category_id"
         const val EXTRA_CATEGORY_NAME = "category_name"
         const val EXTRA_IS_RESTORED = "is_restored"
-        private const val SAVED_JOKES = "saved_jokes"
     }
 }

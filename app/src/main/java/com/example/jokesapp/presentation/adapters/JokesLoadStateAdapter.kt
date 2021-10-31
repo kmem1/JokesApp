@@ -11,6 +11,14 @@ import com.example.jokesapp.databinding.ProgressItemBinding
 class JokesLoadStateAdapter(private val retry: () -> Unit, private val errorMessage: String) :
     RecyclerView.Adapter<JokesLoadStateAdapter.ViewHolder>() {
 
+    private var recyclerView: RecyclerView? = null
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+
+        this.recyclerView = recyclerView
+    }
+
     var loadState: LoadState = LoadState.Success
         set(loadState) {
             if (field != loadState) {
@@ -18,11 +26,11 @@ class JokesLoadStateAdapter(private val retry: () -> Unit, private val errorMess
                 val displayNewItem = displayLoadStateAsItem(loadState)
 
                 if (displayOldItem && !displayNewItem) {
-                    notifyItemRemoved(0)
+                    recyclerView?.post { notifyItemRemoved(0) }
                 } else if (displayNewItem && !displayOldItem) {
-                    notifyItemInserted(0)
+                    recyclerView?.post { notifyItemInserted(0) }
                 } else if (displayOldItem && displayNewItem) {
-                    notifyItemChanged(0)
+                    recyclerView?.post { notifyItemChanged(0) }
                 }
 
                 field = loadState
